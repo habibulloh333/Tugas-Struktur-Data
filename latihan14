@@ -1,0 +1,23 @@
+int squareTail(int n, int acc) {
+  if (n == 0) return acc;
+  return squareTail(n - 1, acc + 2 * n - 1);
+}
+
+int square(int n) {
+  return squareTail(n, 0);
+}
+
+int cubeTail(int n, int acc) {
+  if (n == 0) return acc;
+  return cubeTail(n - 1, acc + 3 * n * n - 3 * n + 1);
+}
+
+int cube(int n) {
+  return cubeTail(n, 0);
+}
+
+void main() {
+  print('Square of 5: ${square(5)}');
+  print('Cube of 5: ${cube(5)}');
+  print('Cube of 123: ${cube(123)}');
+}
