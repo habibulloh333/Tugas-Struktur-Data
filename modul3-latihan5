@@ -1,0 +1,168 @@
+import 'dart:math';
+import 'dart:io';
+
+void insertionSort<T extends Comparable>(List<T> arr, bool ascending) {
+  for (int i = 1; i < arr.length; i++) {
+    T key = arr[i];
+    int j = i - 1;
+    while (j >= 0 && (ascending ? arr[j].compareTo(key) > 0 : arr[j].compareTo(key) < 0)) {
+      arr[j + 1] = arr[j];
+      j--;
+    }
+    arr[j + 1] = key;
+  }
+}
+
+void selectionSort<T extends Comparable>(List<T> arr, bool ascending) {
+  for (int i = 0; i < arr.length - 1; i++) {
+    int targetIndex = i;
+    for (int j = i + 1; j < arr.length; j++) {
+      if (ascending ? arr[j].compareTo(arr[targetIndex]) < 0 : arr[j].compareTo(arr[targetIndex]) > 0) {
+        targetIndex = j;
+      }
+    }
+    T temp = arr[i];
+    arr[i] = arr[targetIndex];
+    arr[targetIndex] = temp;
+  }
+}
+
+void bubbleSort<T extends Comparable>(List<T> arr, bool ascending) {
+  for (int i = 0; i < arr.length - 1; i++) {
+    for (int j = 0; j < arr.length - i - 1; j++) {
+      if (ascending ? arr[j].compareTo(arr[j + 1]) > 0 : arr[j].compareTo(arr[j + 1]) < 0) {
+        T temp = arr[j];
+        arr[j] = arr[j + 1];
+        arr[j + 1] = temp;
+      }
+    }
+  }
+}
+
+void shellSort<T extends Comparable>(List<T> arr, bool ascending) {
+  int n = arr.length;
+  for (int gap = n ~/ 2; gap > 0; gap ~/= 2) {
+    for (int i = gap; i < n; i++) {
+      T temp = arr[i];
+      int j;
+      for (j = i; j >= gap && (ascending ? arr[j - gap].compareTo(temp) > 0 : arr[j - gap].compareTo(temp) < 0); j -= gap) {
+        arr[j] = arr[j - gap];
+      }
+      arr[j] = temp;
+    }
+  }
+}
+
+void quickSort<T extends Comparable>(List<T> arr, int left, int right, bool ascending) {
+  if (left < right) {
+    int pivotIndex = partition(arr, left, right, ascending);
+    quickSort(arr, left, pivotIndex - 1, ascending);
+    quickSort(arr, pivotIndex + 1, right, ascending);
+  }
+}
+
+int partition<T extends Comparable>(List<T> arr, int left, int right, bool ascending) {
+  T pivot = arr[right];
+  int i = left - 1;
+  for (int j = left; j < right; j++) {
+    if (ascending ? arr[j].compareTo(pivot) <= 0 : arr[j].compareTo(pivot) >= 0) {
+      i++;
+      T temp = arr[i];
+      arr[i] = arr[j];
+      arr[j] = temp;
+    }
+  }
+  T temp = arr[i + 1];
+  arr[i + 1] = arr[right];
+  arr[right] = temp;
+  return i + 1;
+}
+
+void mergeSort<T extends Comparable>(List<T> arr, bool ascending) {
+  if (arr.length > 1) {
+    int mid = arr.length ~/ 2;
+    List<T> left = arr.sublist(0, mid);
+    List<T> right = arr.sublist(mid);
+    mergeSort(left, ascending);
+    mergeSort(right, ascending);
+    merge(arr, left, right, ascending);
+  }
+}
+
+void merge<T extends Comparable>(List<T> arr, List<T> left, List<T> right, bool ascending) {
+  int i = 0, j = 0, k = 0;
+  while (i < left.length && j < right.length) {
+    if (ascending ? left[i].compareTo(right[j]) <= 0 : left[i].compareTo(right[j]) >= 0) {
+      arr[k++] = left[i++];
+    } else {
+      arr[k++] = right[j++];
+    }
+  }
+  while (i < left.length) arr[k++] = left[i++];
+  while (j < right.length) arr[k++] = right[j++];
+}
+
+void main() {
+  List<int> data = List<int>.generate(100, (index) => Random().nextInt(1000));
+
+  print("\n=== ALGORITMA SORTING ===");
+  print("1. Insertion");
+  print("2. Selection");
+  print("3. Bubble");
+  print("4. Shell");
+  print("5. Quick");
+  print("6. Merge");
+
+  stdout.write("Pilihan: ");
+  int? choice = int.tryParse(stdin.readLineSync() ?? '');
+
+  if (choice == null || choice < 1 || choice > 6) {
+    print("Pilihan tidak valid.");
+    return;
+  }
+
+  print("\n1. Ascending");
+  print("2. Descending");
+  stdout.write("Pilihan: ");
+  int? order = int.tryParse(stdin.readLineSync() ?? '');
+
+  if (order == null || (order != 1 && order != 2)) {
+    print("Pilihan tidak valid.");
+    return;
+  }
+
+  bool ascending = order == 1;
+
+  print("\nData Sebelum Sorting:");
+  print(data);
+
+  DateTime start = DateTime.now();
+  switch (choice) {
+    case 1:
+      insertionSort<num>(data, ascending);
+      break;
+    case 2:
+      selectionSort<num>(data, ascending);
+      break;
+    case 3:
+      bubbleSort<num>(data, ascending);
+      break;
+    case 4:
+      shellSort<num>(data, ascending);
+      break;
+    case 5:
+      quickSort<num>(data, 0, data.length - 1, ascending);
+      break;
+    case 6:
+      mergeSort<num>(data, ascending);
+      break;
+    default:
+      print("Pilihan tidak valid.");
+      return;
+  }
+  Duration elapsedTime = DateTime.now().difference(start);
+
+  print("\nData Setelah Sorting:");
+  print(data);
+  print("Waktu: ${elapsedTime.inMilliseconds} ms");
+}
