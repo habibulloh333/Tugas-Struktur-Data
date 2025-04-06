@@ -1,0 +1,43 @@
+int sequentialSearch(List<int> arr, int target) {
+  int comparisons = 0;
+  for (int i = 0; i < arr.length; i++) {
+    comparisons++;
+    if (arr[i] == target) {
+      print("Sequential Search - Jumlah perbandingan: $comparisons");
+      return i;
+    }
+  }
+  print("Sequential Search - Jumlah perbandingan: $comparisons");
+  return -1;
+}
+
+int binarySearch(List<int> arr, int target) {
+  int left = 0, right = arr.length - 1;
+  int comparisons = 0;
+  
+  while (left <= right) {
+    comparisons++;
+    int mid = left + (right - left) ~/ 2;
+    
+    if (arr[mid] == target) {
+      print("Binary Search - Jumlah perbandingan: $comparisons");
+      return mid;
+    }
+    if (arr[mid] < target) {
+      left = mid + 1;
+    } else {
+      right = mid - 1;
+    }
+  }
+  
+  print("Binary Search - Jumlah perbandingan: $comparisons");
+  return -1;
+}
+
+void main() {
+  List<int> data = [1, 3, 5, 7, 9, 11, 13, 15, 17, 19];
+  int target = 9;
+  
+  print("Hasil Sequential Search: ${sequentialSearch(data, target)}");
+  print("Hasil Binary Search: ${binarySearch(data, target)}");
+}
