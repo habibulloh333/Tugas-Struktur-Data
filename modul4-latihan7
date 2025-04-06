@@ -1,0 +1,55 @@
+import 'dart:io';
+
+int binarySearch(List<List<dynamic>> sortedData, int target) {
+  int left = 0;
+  int right = sortedData.length - 1;
+
+  while (left <= right) {
+    int mid = (left + right) ~/ 2;
+    if (sortedData[mid][0] == target) {
+      return sortedData[mid][1]; // Kembalikan indeks asli
+    } else if (sortedData[mid][0] < target) {
+      left = mid + 1;
+    } else {
+      right = mid - 1;
+    }
+  }
+
+  return -1; // Tidak ditemukan
+}
+
+void main() {
+  // Data acak
+  List<int> dataAsli = [24, 5, 17, 38, 10, 50];
+
+  print("Data asli : $dataAsli");
+
+  // Pasangkan nilai dengan indeks aslinya
+  var dataDenganIndeks = List.generate(
+    dataAsli.length,
+    (i) => [dataAsli[i], i],
+  );
+
+  // Urutkan berdasarkan nilai
+  dataDenganIndeks.sort((a, b) => a[0].compareTo(b[0]));
+
+  // Tampilkan data setelah diurutkan
+  print("Data terurut (nilai, indeks asli):");
+  for (var item in dataDenganIndeks) {
+    print("${item[0]} (index: ${item[1]})");
+  }
+
+  // Input target
+  stdout.write("\nMasukkan angka yang dicari: ");
+  int target = int.parse(stdin.readLineSync()!);
+
+  // Cari menggunakan binary search
+  int hasil = binarySearch(dataDenganIndeks, target);
+
+  // Tampilkan hasil
+  if (hasil != -1) {
+    print("Angka $target ditemukan di indeks asli: $hasil");
+  } else {
+    print("Angka $target tidak ditemukan dalam data.");
+  }
+}
