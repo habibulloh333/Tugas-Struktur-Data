@@ -1,0 +1,49 @@
+class PostfixEval {
+  String postfixExpression;
+
+  PostfixEval(this.postfixExpression);
+
+  int compute(int left, int right, String operator) {
+    switch (operator) {
+      case '+':
+        return left + right;
+      case '-':
+        return left - right;
+      case '*':
+        return left * right;
+      case '/':
+        return left ~/ right; // Integer division
+      default:
+        throw Exception("Operator tidak valid");
+    }
+  }
+
+  int evaluate() {
+    List<int> stack = [];
+    List<String> tokens = postfixExpression.split(' ');
+
+    for (var token in tokens) {
+      if (isOperator(token)) {
+        int right = stack.removeLast();
+        int left = stack.removeLast();
+        stack.add(compute(left, right, token));
+      } else {
+        stack.add(int.parse(token));
+      }
+    }
+    
+    return stack.last;
+  }
+
+  bool isOperator(String token) {
+    return token == '+' || token == '-' || token == '*' || token == '/';
+  }
+}
+
+void main() {
+  String expression = "4 3 5 * +"; // Ubah sesuai dengan ekspresi postfix yang ingin dihitung
+  PostfixEval postfixEval = PostfixEval(expression);
+  
+  int result = postfixEval.evaluate();
+  print("Hasil dari ekspresi postfix '$expression' adalah: $result");
+}
