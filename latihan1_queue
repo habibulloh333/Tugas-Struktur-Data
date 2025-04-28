@@ -1,0 +1,71 @@
+class CircularQueue {
+  List<int?> elemen;
+  int front;
+  int rear;
+  int maxQueue;
+
+  CircularQueue(this.maxQueue)
+      : elemen = List<int?>.filled(maxQueue, null),
+        front = 0,
+        rear = -1;
+
+  bool isEmpty() {
+    return front == (rear + 1) % maxQueue;
+  }
+
+  bool isFull() {
+    return (rear + 2) % maxQueue == front;
+  }
+
+  void enqueue(int data) {
+    if (isFull()) {
+      print('Queue Overflow, tidak dapat mengisi lagi!');
+    } else {
+      rear = (rear + 1) % maxQueue;
+      elemen[rear] = data;
+      print('Enqueued: $data');
+    }
+  }
+
+  int? dequeue() {
+    if (isEmpty()) {
+      print("Queue Underflow");
+      return null;
+    } else {
+      int data = elemen[front]!;
+      elemen[front] = null; // Mengosongkan posisi
+      front = (front + 1) % maxQueue;
+      print('Dequeued: $data');
+      return data;
+    }
+  }
+
+  void printQueue() {
+    if (!isEmpty()) {
+      print('Menampilkan urutan dari posisi tertinggi:');
+      int index = front;
+      while (index != (rear + 1) % maxQueue) {
+        print('Elemen ke-$index = ${elemen[index]}');
+        index = (index + 1) % maxQueue;
+      }
+    } else {
+      print('Queue masih kosong');
+    }
+  }
+}
+
+void main() {
+  CircularQueue cq = CircularQueue(5);
+  cq.enqueue(10);
+  cq.enqueue(20);
+  cq.enqueue(30);
+  cq.printQueue();
+
+  cq.dequeue();
+  cq.printQueue();
+
+  cq.enqueue(40);
+  cq.enqueue(50);
+  cq.enqueue(60); // Ini akan menyebabkan overflow
+  cq.printQueue();
+}
