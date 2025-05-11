@@ -1,0 +1,115 @@
+class Node {
+  String data;
+  Node? next;
+
+  Node(this.data);
+}
+
+class SingleLinkedList {
+  Node? head;
+
+  void addLast(String data) {
+    final newNode = Node(data);
+    if (head == null) {
+      head = newNode;
+      return;
+    }
+    Node current = head!;
+    while (current.next != null) {
+      current = current.next!;
+    }
+    current.next = newNode;
+  }
+
+  void addFirst(String data) {
+    final newNode = Node(data);
+    newNode.next = head;
+    head = newNode;
+  }
+
+  void addAfter(String target, String data) {
+    Node? current = head;
+    while (current != null && current.data != target) {
+      current = current.next;
+    }
+    if (current != null) {
+      final newNode = Node(data);
+      newNode.next = current.next;
+      current.next = newNode;
+    }
+  }
+
+  void deleteFirst() {
+    if (head != null) {
+      head = head!.next;
+    }
+  }
+
+  void deleteLast() {
+    if (head == null) return;
+    if (head!.next == null) {
+      head = null;
+      return;
+    }
+
+    Node current = head!;
+    while (current.next!.next != null) {
+      current = current.next!;
+    }
+    current.next = null;
+  }
+
+  /// Hapus node berdasarkan posisi (index)
+  void deleteAt(int index) {
+    if (index < 0 || head == null) return;
+
+    if (index == 0) {
+      head = head!.next;
+      return;
+    }
+
+    Node current = head!;
+    for (int i = 0; i < index - 1; i++) {
+      if (current.next == null) return; 
+      current = current.next!;
+    }
+
+    if (current.next != null) {
+      current.next = current.next!.next;
+    }
+  }
+
+  void printList() {
+    Node? current = head;
+    while (current != null) {
+      print(current.data);
+      current = current.next;
+    }
+  }
+}
+
+void main() {
+  var list = SingleLinkedList();
+
+  list.addLast("Node 0");
+  list.addLast("Node 1");
+  list.addLast("Node 2");
+  list.addLast("Node 3");
+  list.addLast("Node 4");
+
+  print("Sebelum penghapusan:");
+  list.printList();
+
+  // Menghapus node pada posisi ke-2 (Node 2)
+  list.deleteAt(2);
+
+  print("\nSetelah menghapus node pada index 2:");
+  list.printList();
+
+  // Coba hapus index pertama dan terakhir
+  list.deleteAt(0); // Hapus head
+  list.deleteAt(2); // Hapus node terakhir saat ini 
+
+  print("\nSetelah menghapus index 0 dan index 2:");
+  list.printList();
+}
