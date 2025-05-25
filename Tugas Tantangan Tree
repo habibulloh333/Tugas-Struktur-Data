@@ -1,0 +1,150 @@
+import 'dart:collection';
+import 'dart:io';
+
+class Node<T> {
+  T data;
+  Node? left;
+  Node? right;
+
+  Node(this.data);
+}
+
+class BinaryTree {
+  Node? root;
+
+  // 1. Tambah node Level Order (dengan Queue)
+  void tambahLevelOrder(dynamic value) {
+    Node newNode = Node(value);
+    if (root == null) {
+      root = newNode;
+      return;
+    }
+
+    Queue<Node> queue = Queue();
+    queue.add(root!);
+
+    while (queue.isNotEmpty) {
+      Node current = queue.removeFirst();
+
+      if (current.left == null) {
+        current.left = newNode;
+        return;
+      } else {
+        queue.add(current.left!);
+      }
+
+      if (current.right == null) {
+        current.right = newNode;
+        return;
+      } else {
+        queue.add(current.right!);
+      }
+    }
+  }
+
+  // 2. Tambah node berdasarkan target (linear search)
+  void tambahBerdasarkanTarget(dynamic target, dynamic value) {
+    if (root == null) return;
+
+    Queue<Node> queue = Queue();
+    queue.add(root!);
+
+    while (queue.isNotEmpty) {
+      Node current = queue.removeFirst();
+
+      if (current.data == target) {
+        if (current.left == null) {
+          current.left = Node(value);
+        } else if (current.right == null) {
+          current.right = Node(value);
+        }
+        return;
+      }
+
+      if (current.left != null) queue.add(current.left!);
+      if (current.right != null) queue.add(current.right!);
+    }
+  }
+
+  // 3. In Order (non-rekursif)
+  void inOrder() {
+    List<Node> stack = [];
+    Node? current = root;
+
+    while (current != null || stack.isNotEmpty) {
+      while (current != null) {
+        stack.add(current);
+        current = current.left;
+      }
+
+      current = stack.removeLast();
+      stdout.write('${current.data} ');
+      current = current.right;
+    }
+    stdout.writeln();
+  }
+
+  // 3. Pre Order (non-rekursif)
+  void preOrder() {
+    if (root == null) return;
+
+    List<Node> stack = [root!];
+
+    while (stack.isNotEmpty) {
+      Node current = stack.removeLast();
+      stdout.write('${current.data} ');
+
+      if (current.right != null) stack.add(current.right!);
+      if (current.left != null) stack.add(current.left!);
+    }
+    stdout.writeln();
+  }
+
+  // 3. Post Order (non-rekursif)
+  void postOrder() {
+    if (root == null) return;
+
+    List<Node> stack1 = [root!];
+    List<Node> stack2 = [];
+
+    while (stack1.isNotEmpty) {
+      Node current = stack1.removeLast();
+      stack2.add(current);
+
+      if (current.left != null) stack1.add(current.left!);
+      if (current.right != null) stack1.add(current.right!);
+    }
+
+    while (stack2.isNotEmpty) {
+      stdout.write('${stack2.removeLast().data} ');
+    }
+    stdout.writeln();
+  }
+
+}
+
+void main() {
+  BinaryTree tree = BinaryTree();
+
+  // Tambah node secara level order
+  tree.tambahLevelOrder('A');
+  tree.tambahLevelOrder(2);
+  tree.tambahLevelOrder(3);
+  tree.tambahLevelOrder(4);
+  tree.tambahLevelOrder(5);
+
+  // Tambah berdasarkan target
+  tree.tambahBerdasarkanTarget(3, 6);
+  tree.tambahBerdasarkanTarget(3, 7);
+
+  // Traversal
+  stdout.write("In Order   : ");
+  tree.inOrder();
+
+  stdout.write("Pre Order  : ");
+  tree.preOrder();
+
+  stdout.write("Post Order : ");
+  tree.postOrder();
+
+}
