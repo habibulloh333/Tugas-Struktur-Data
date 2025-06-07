@@ -1,0 +1,100 @@
+import 'dart:io';
+
+class Node {
+  String value;
+  Node? left;
+  Node? right;
+
+  Node(this.value, [this.left, this.right]);
+}
+
+class BinaryTree {
+  Node? root;
+
+  BinaryTree(this.root);
+
+  void inorder(Node? node) {
+    if (node != null) {
+      inorder(node.left);
+      stdout.write(node.value);
+      inorder(node.right);
+    }
+  }
+
+  void preorder(Node? node) {
+    if (node != null) {
+      stdout.write(node.value);
+      preorder(node.left);
+      preorder(node.right);
+    }
+  }
+
+  void postorder(Node? node) {
+    if (node != null) {
+      postorder(node.left);
+      postorder(node.right);
+      stdout.write(node.value);
+    }
+  }
+
+  void printInorder() {
+    print("Inorder:");
+    inorder(root);
+  }
+
+  void printPreorder() {
+    print("\nPreorder:");
+    preorder(root);
+  }
+
+  void printPostorder() {
+    print("\nPostorder:");
+    postorder(root);
+  }
+
+  void printTree(Node? node, {String prefix = "", bool isLeft = true}) {
+    if (node == null) return;
+
+    if (node.right != null) {
+      printTree(node.right,
+          prefix: prefix + (isLeft ? "│   " : "    "), isLeft: false);
+    }
+
+    print(prefix + (isLeft ? "└── " : "┌── ") + "${node.value}");
+
+    if (node.left != null) {
+      printTree(node.left,
+          prefix: prefix + (isLeft ? "    " : "│   "), isLeft: true);
+    }
+  }
+
+  void printTreeStructure() {
+    print("\nBinary Tree Structure:");
+    printTree(root);
+  }
+}
+
+void main() {
+  // Membuat node dari bawah ke atas
+  var nodeA = Node('a');
+  var nodeB = Node('b');
+  var nodeC = Node('c');
+  var nodeD = Node('d');
+  var nodeE = Node('e');
+
+  var nodeMinus = Node('-', nodeC, nodeD);
+  var nodeTimes = Node('*', nodeA, nodeB);
+  var nodeDivide = Node('/', nodeMinus, nodeE);
+  var root = Node('+', nodeTimes, nodeDivide);
+
+  // Buat Binary Tree
+  var tree = BinaryTree(root);
+
+  // Traversal
+  tree.printInorder();
+  tree.printPreorder();
+  tree.printPostorder();
+
+  // Struktur Tree
+  tree.printTreeStructure();
+}
