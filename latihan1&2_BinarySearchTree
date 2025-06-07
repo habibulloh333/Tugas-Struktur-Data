@@ -1,0 +1,204 @@
+import 'dart:io';
+
+class STNode<T> {
+  T nodeValue;
+  STNode<T>? left, right, parent;
+
+  STNode(this.nodeValue, [this.parent]);
+}
+
+class BinarySearchTree<T extends Comparable> {
+  STNode<T>? root;
+  int treeSize = 0;
+
+  //Insert Data di BST
+  bool add(T newValue) {
+    STNode<T>? node = root, parent;
+    int orderValue = 0;
+
+    while (node != null) {
+      parent = node;
+      orderValue = newValue.compareTo(node.nodeValue);
+
+      if (orderValue == 0) {
+        return false;
+      } else if (orderValue < 0) {
+        node = node.left;
+      } else {
+        node = node.right;
+      }
+    }
+
+    STNode<T> newNode = STNode(newValue, parent);
+    if (parent == null) {
+      root = newNode;
+    } else if (orderValue < 0) {
+      parent.left = newNode;
+    } else {
+      parent.right = newNode;
+    }
+
+    treeSize++;
+    return true;
+  }
+
+  void printPreOrder(STNode? node) {
+    if (node != null) {
+      stdout.write('${node.nodeValue} ');
+      printPreOrder(node.left);
+      printPreOrder(node.right);
+    }
+  }
+
+  void printPreOrderFromRoot() {
+    printPreOrder(root);
+  }
+
+  void inOrder(STNode? node) {
+    if (node != null) {
+      inOrder(node.left);
+      stdout.write(' ${node.nodeValue}');
+      inOrder(node.right);
+    }
+  }
+
+  void printInOrder() {
+    inOrder(root);
+  }
+
+  void postOrder(STNode? node) {
+    if (node != null) {
+      postOrder(node.left);
+      postOrder(node.right);
+      stdout.write(' ${node.nodeValue}');
+    }
+  }
+
+  void printPostOrder() {
+    postOrder(root);
+  }
+
+  T? getRootValue() {
+    return root?.nodeValue;
+  }
+
+  STNode<T>? findNote(T data) {
+    STNode<T>? node = root;
+    int orderValue = 0;
+
+    while (node != null) {
+      orderValue = data.compareTo(node.nodeValue);
+
+      if (orderValue == 0) {
+        return node;
+      } else if (orderValue < 0) {
+        node = node.left;
+      } else {
+        node = node.right;
+      }
+    }
+    return null;
+  }
+
+  void removeNode(STNode<T>? dNode) {
+    if (dNode == null) {
+      return;
+    }
+
+    STNode<T>? pNode, rNode;
+    pNode = dNode.parent;
+
+    if (dNode.left == null || dNode.right == null) {
+      if (dNode.right == null) {
+        rNode = dNode.left;
+      } else {
+        rNode = dNode.right;
+      }
+
+      if (rNode != null) {
+        print('Set Parent');
+        rNode.parent = pNode;
+      }
+
+      if (pNode == null) {
+        root = rNode;
+      } else if ((dNode.nodeValue as Comparable<T>).compareTo(pNode.nodeValue) <
+          0) {
+        pNode.left = rNode;
+      } else {
+        pNode.right = rNode;
+      }
+    } // Node yang dihapus mempunyai dua anak
+    else {
+      STNode<T>? pOfRNode = dNode;
+      rNode = dNode.right;
+      pOfRNode = dNode;
+      while (rNode!.left != null) {
+        pOfRNode = rNode;
+        rNode = rNode.left;
+      }
+      dNode.nodeValue = rNode.nodeValue;
+      if (pOfRNode == dNode) {
+        dNode.right = rNode.right;
+      } else {
+        pOfRNode!.left = rNode.right;
+      }
+      if (rNode.right != null) {
+        rNode.right!.parent = pOfRNode;
+      }
+    }
+  }
+
+  T? first() {
+    STNode<T>? node = root;
+    if (node == null) return null;
+
+    while (node!.left != null) {
+      node = node.left;
+    }
+    return node.nodeValue;
+  }
+
+  T? last() {
+    STNode<T>? node = root;
+    if (node == null) return null;
+
+    while (node!.right != null) {
+      node = node.right;
+    }
+    return node.nodeValue;
+  }
+}
+
+void main() {
+  BinarySearchTree bst = BinarySearchTree();
+
+  bst.add(10);
+  bst.add(5);
+  bst.add(15);
+  bst.add(3);
+  bst.add(4);
+  bst.add(14);
+  bst.add(16);
+
+  print('Pre Order: ');
+  bst.printPreOrderFromRoot();
+
+  print('\nIn Order: ');
+  bst.printInOrder();
+
+  print('\nPost Order: ');
+  bst.printPostOrder();
+
+  print('\n Nilai root: ${bst.getRootValue()}');
+
+  var node = bst.findNote(5);
+  if (node != null) {
+    print('\nNode Target ${node.nodeValue} ditemukan ');
+  } else {
+    print('Node Not Found');
+  }
+
+  print('\nNilai terkecil (first): ${bst.first()}');
+  print('Nilai terbesar (last): ${bst.last()}');
+}
