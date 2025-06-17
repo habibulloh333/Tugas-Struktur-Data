@@ -1,0 +1,282 @@
+import 'dart:io';
+
+// ========== ABSTRAKSI (Interface) ==========
+abstract interface class MediaItem {
+  String getJudul();
+  String getPenulis();
+  String getGenre();
+  int getTahun();
+  String toString();
+}
+
+// ========== PEWARISAN (Inheritance dari MediaItem) ==========
+class Buku implements MediaItem {
+  final String _judul;
+  final String _penulis;
+  final String _genre;
+  final int _tahun;
+
+  Buku(this._judul, this._penulis, this._genre, this._tahun);
+
+  @override
+  String getJudul() => _judul;
+
+  @override
+  String getPenulis() => _penulis;
+
+  @override
+  String getGenre() => _genre;
+
+  @override
+  int getTahun() => _tahun;
+
+  @override
+  String toString() => '📘 Buku: "$_judul" oleh $_penulis ($_tahun)';
+}
+
+class Majalah implements MediaItem {
+  final String _judul;
+  final String _editor;
+  final String _kategori;
+  final int _tahun;
+
+  Majalah(this._judul, this._editor, this._kategori, this._tahun);
+
+  @override
+  String getJudul() => _judul;
+
+  @override
+  String getPenulis() => _editor;
+
+  @override
+  String getGenre() => _kategori;
+
+  @override
+  int getTahun() => _tahun;
+
+  @override
+  String toString() => '📰 Majalah: "$_judul" diedit oleh $_editor ($_tahun)';
+}
+
+// ========== STRUKTUR DATA ==========
+
+// Binary Search Tree untuk pencarian
+class NodeBST {
+  MediaItem item;
+  NodeBST? kiri, kanan;
+  NodeBST(this.item);
+}
+
+class PohonMedia {
+  NodeBST? akar;
+
+  void tambah(MediaItem item) {
+    akar = _tambahRekursif(akar, item);
+  }
+
+  NodeBST _tambahRekursif(NodeBST? simpul, MediaItem item) {
+    if (simpul == null) return NodeBST(item);
+    if (item.getJudul().compareTo(simpul.item.getJudul()) < 0) {
+      simpul.kiri = _tambahRekursif(simpul.kiri, item);
+    } else {
+      simpul.kanan = _tambahRekursif(simpul.kanan, item);
+    }
+    return simpul;
+  }
+
+  MediaItem? cari(String judul) {
+    return _cariRekursif(akar, judul);
+  }
+
+  MediaItem? _cariRekursif(NodeBST? simpul, String judul) {
+    if (simpul == null) return null;
+    if (simpul.item.getJudul() == judul) return simpul.item;
+    if (judul.compareTo(simpul.item.getJudul()) < 0) {
+      return _cariRekursif(simpul.kiri, judul);
+    } else {
+      return _cariRekursif(simpul.kanan, judul);
+    }
+  }
+}
+
+// Linked List untuk peminjaman
+class NodePinjam {
+  MediaItem item;
+  NodePinjam? berikutnya;
+  
+  NodePinjam(this.item);
+}
+
+class DaftarPinjam {
+  NodePinjam? kepala;
+
+  void pinjam(MediaItem item) {
+    var simpul = NodePinjam(item);
+    simpul.berikutnya = kepala;
+    kepala = simpul;
+  }
+
+  void tampilkan() {
+    if (kepala == null) {
+      print("📭 Belum ada item yang dipinjam.");
+      return;
+    }
+    print("📋 Daftar Item yang Dipinjam:");
+    var temp = kepala;
+    while (temp != null) {
+      print("- ${temp.item}");
+      temp = temp.berikutnya;
+    }
+  }
+}
+
+// Stack untuk riwayat pencarian
+class RiwayatCari {
+  final List<String> _stack = [];
+
+  void simpan(String judul) {
+    _stack.add(judul);
+  }
+
+  void tampilkan() {
+    if (_stack.isEmpty) {
+      print("📄 Riwayat kosong.");
+    } else {
+      print("🔍 Riwayat Pencarian:");
+      for (var judul in _stack.reversed) {
+        print("- $judul");
+      }
+    }
+  }
+}
+
+// ========== CLASS UTAMA (Perpustakaan) ==========
+class Perpustakaan {
+  List<MediaItem> koleksi = [];
+  final PohonMedia pohon = PohonMedia();
+  final DaftarPinjam daftarPinjam = DaftarPinjam();
+  final RiwayatCari riwayatCari = RiwayatCari();
+
+  void tambahItem() {
+    print("1. Buku\n2. Majalah");
+    stdout.write("Pilih jenis (1/2): ");
+    String pilihan = stdin.readLineSync()!;
+
+    if (pilihan != '1' && pilihan != '2') {
+      print("⚠️ Pilihan tidak Ada. Silakan coba lagi.");
+      return;
+    }
+
+    stdout.write("Judul: ");
+    String judul = stdin.readLineSync()!;
+    stdout.write("Penulis/Editor: ");
+    String penulis = stdin.readLineSync()!;
+    stdout.write("Genre/Kategori: ");
+    String genre = stdin.readLineSync()!;
+    stdout.write("Tahun: ");
+    int tahun = int.parse(stdin.readLineSync()!);
+
+    MediaItem item;
+    if (pilihan == '1') {
+      item = Buku(judul, penulis, genre, tahun);
+    } else {
+      item = Majalah(judul, penulis, genre, tahun);
+    }
+
+    koleksi.add(item);
+    pohon.tambah(item);
+    print("✅ Item berhasil ditambahkan!");
+  
+}
+
+  void cariItem() {
+    stdout.write("Masukkan judul: ");
+    String judul = stdin.readLineSync()!;
+    riwayatCari.simpan(judul);
+    var hasil = pohon.cari(judul);
+    if (hasil != null) {
+      print("📗 Ditemukan: $hasil");
+    } else {
+      print("❌ Tidak ditemukan.");
+    }
+  }
+
+  void pinjamItem() {
+    stdout.write("Masukkan judul item yang ingin dipinjam: ");
+    String judul = stdin.readLineSync()!;
+    var item = pohon.cari(judul);
+    if (item != null) {
+      daftarPinjam.pinjam(item);
+      print("✅ \"$judul\" berhasil dipinjam.");
+    } else {
+      print("❌ Item tidak ditemukan.");
+    }
+  }
+
+  void tampilkanSemua() {
+    if (koleksi.isEmpty) {
+      print("🚫 Tidak ada item.");
+      return;
+    }
+    print("📚 Semua Koleksi:");
+    for (var item in koleksi) {
+      print("- $item");
+    }
+  }
+
+  void urutkan() {
+    koleksi.sort((a, b) => a.getTahun().compareTo(b.getTahun()));
+    print("✅ Diurutkan berdasarkan tahun:");
+    tampilkanSemua();
+  }
+
+  void menu() {
+    while (true) {
+      print("\n📌 MENU PERPUSTAKAAN");
+      print("1. Tambah item");
+      print("2. Cari item");
+      print("3. Lihat semua koleksi");
+      print("4. Pinjam item");
+      print("5. Lihat item dipinjam");
+      print("6. Riwayat pencarian");
+      print("7. Urutkan koleksi berdasarkan tahun");
+      print("0. Keluar");
+      stdout.write("Pilihan Anda: ");
+      String pilih = stdin.readLineSync()!;
+
+      switch (pilih) {
+        case '1':
+          tambahItem();
+          break;
+        case '2':
+          cariItem();
+          break;
+        case '3':
+          tampilkanSemua();
+          break;
+        case '4':
+          pinjamItem();
+          break;
+        case '5':
+          daftarPinjam.tampilkan();
+          break;
+        case '6':
+          riwayatCari.tampilkan();
+          break;
+        case '7':
+          urutkan();
+          break;
+        case '0':
+          print("👋 Terima kasih telah menggunakan sistem ini.");
+          return;
+        default:
+          print("⚠️ Pilihan tidak valid.");
+      }
+    }
+  }
+}
+
+void main() {
+  var app = Perpustakaan();
+  app.menu();
+}
